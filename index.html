@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Player</title>
+    <link rel="stylesheet" href="styles.css">
+        
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            YouTube Player
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="video-container">
+            <div class="responsive-embed" id="playerContainer">
+                <iframe id="videoFrame" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+            
+        </div>
+        
+        <div class="playlist-container" id="playlistContainer">
+            <!-- Thumbnails will be loaded here -->
+        </div>
+    </div>
+    
+    <script>
+        let videos = [];
+        
+        // Fetch video IDs from JSON file
+        fetch('videos.json')
+            .then(response => response.json())
+            .then(data => {
+                videos = data;
+                renderPlaylist(videos);
+                if (videos.length > 0) {
+                    playVideo(0, videos[0]);
+                }
+            });
+        
+        function renderPlaylist(videoIds) {
+            const container = document.getElementById('playlistContainer');
+            container.innerHTML = '';
+            
+            videoIds.forEach((videoId, index) => {
+                const item = document.createElement('div');
+                item.className = 'playlist-item' + (index === 0 ? ' active' : '');
+                item.onclick = () => {
+                    playVideo(index, videoId);
+                };
+                
+                // Create thumbnail with play icon overlay
+                item.innerHTML = `
+                    <img src="https://i.ytimg.com/vi/${videoId}/mqdefault.jpg" 
+                         class="playlist-thumbnail" 
+                         alt="Video thumbnail">
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+        
+        function playVideo(index, videoId) {
+            // Update iframe src
+            document.getElementById('videoFrame').src = 
+                `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&autoplay=1`;
+            
+            // Update active class
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach(item => item.classList.remove('active'));
+            if (items[index]) {
+                items[index].classList.add('active');
+            }
+        }
+     
+
+    </script>
+</body>
+</html>
